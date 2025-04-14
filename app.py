@@ -7,14 +7,18 @@ import os
 st.set_page_config(page_title="מנתח עוקבים באינסטגרם", layout="centered")
 st.title("🔍 ניתוח עוקבים באינסטגרם")
 
-username = st.text_input("שם משתמש באינסטגרם")
-password = st.text_input("סיסמה", type="password")
+username = st.text_input("שם משתמש באינסטגרם (ללא סיסמה)")
 
 if st.button("נתח את הפרופיל"):
-    with st.spinner("מתחבר לאינסטגרם..."):
+    with st.spinner("טוען נתונים מהאינסטגרם..."):
         try:
             L = instaloader.Instaloader()
-            L.login(username, password)
+            session_file = f"session/session-{username}"
+            if not os.path.exists(session_file):
+                st.error("קובץ session לא קיים. ודאי שהעלית אותו לתיקייה 'session'.")
+                st.stop()
+
+            L.load_session_from_file(username, session_file)
             profile = instaloader.Profile.from_username(L.context, username)
 
             # קבלת העוקבים והעוקבים אחריהם
